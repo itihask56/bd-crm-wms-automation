@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="BD CRM Automation Suite">
+
+    <test name="UI Tests">
+
+        <classes>
+
+            <class name="com.emoha.crm.tests.ui.GoogleTest"/>
+
+        </classes>
+
+    </test>
+
+</suite>
