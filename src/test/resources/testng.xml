@@ -5,9 +5,7 @@
     <test name="UI Tests">
 
         <classes>
-
-            <class name="com.emoha.crm.tests.ui.GoogleTest"/>
-
+            <class name="com.emoha.crm.tests.ui.LoginTest"/>
         </classes>
 
     </test>

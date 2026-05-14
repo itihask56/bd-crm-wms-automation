@@ -26,12 +26,14 @@ public class DriverFactory {
             WebDriverManager.chromedriver().setup();
 
             ChromeOptions options = new ChromeOptions();
+            // Auto allow camera & mic permissions
+            options.addArguments("--use-fake-ui-for-media-stream");
+            // Disable browser notifications
+            options.addArguments("--disable-notifications");
 
             if (headless) {
-
                 options.addArguments("--headless=new");
             }
-
             driver = new ChromeDriver(options);
         }
 
