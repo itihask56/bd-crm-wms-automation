@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 public class LoginTest extends BaseTest {
 
     @Test
-    public void verifyLoginFlow() throws InterruptedException {
+    public void verifyLoginFlow() {
 
         driver.get(ConfigReader.getProperty("baseUrl"));
 

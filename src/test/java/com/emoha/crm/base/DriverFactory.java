@@ -8,45 +8,66 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 public class DriverFactory {
 
-    public static WebDriver driver;
+    private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
     public static WebDriver initializeDriver() {
 
-        String browser =
-                System.getProperty("browser") != null
-                        ? System.getProperty("browser")
-                        : ConfigReader.getProperty("browser");
+        String browser = ConfigReader.getProperty("browser");
 
         boolean headless =
                 Boolean.parseBoolean(
                         ConfigReader.getProperty("headless"));
 
+        WebDriver webDriver;
+
         if (browser.equalsIgnoreCase("chrome")) {
 
-            WebDriverManager.chromedriver().setup();
-
-            ChromeOptions options = new ChromeOptions();
-            // Auto allow camera & mic permissions
-            options.addArguments("--use-fake-ui-for-media-stream");
-            // Disable browser notifications
-            options.addArguments("--disable-notifications");
-
-            if (headless) {
-                options.addArguments("--headless=new");
-            }
-            driver = new ChromeDriver(options);
+            webDriver = initializeChromeDriver(headless);
+        } else {
+            throw new IllegalArgumentException(
+                    "Unsupported browser: "
+                            + browser
+                            + ". Supported browser: chrome"
+            );
         }
 
-        driver.manage().window().maximize();
+        if (!headless) {
+            webDriver.manage().window().maximize();
+        }
 
-        return driver;
+        driver.set(webDriver);
+
+        return webDriver;
     }
 
     public static void quitDriver() {
+        WebDriver webDriver = driver.get();
 
-        if (driver != null) {
+        if (webDriver != null) {
 
-            driver.quit();
+            webDriver.quit();
+            driver.remove();
         }
+    }
+
+    public static WebDriver getDriver() {
+
+        return driver.get();
+    }
+
+    private static WebDriver initializeChromeDriver(boolean headless) {
+
+        WebDriverManager.chromedriver().setup();
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--use-fake-ui-for-media-stream");
+        options.addArguments("--disable-notifications");
+
+        if (headless) {
+            options.addArguments("--headless=new");
+            options.addArguments("--window-size=1920,1080");
+        }
+
+        return new ChromeDriver(options);
     }
 }

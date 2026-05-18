@@ -21,6 +21,9 @@ public class OtpModal {
     By submitButton =
             By.xpath("//button[@htmltype='submit']");
 
+    By adminHeaderLogo =
+            By.cssSelector("img.application-header-logo[alt='Emoha Admin']");
+
     // Constructor
     public OtpModal(WebDriver driver) {
 
@@ -39,7 +42,6 @@ public class OtpModal {
 
     public void enterOtp(String otp) {
         WaitUtils.waitForElementClickable(driver,otpInput).sendKeys(otp);
-//        driver.findElement(otpInput).sendKeys(otp);
     }
 
     public void clickSubmit() {
@@ -52,7 +54,7 @@ public class OtpModal {
     public void completeOtpFlow(
             String mobile,
             String otp
-    ) throws InterruptedException {
+    ) {
 
         enterMobile(mobile);
 
@@ -61,6 +63,7 @@ public class OtpModal {
         enterOtp(otp);
 
         clickSubmit();
-        Thread.sleep(5000);
+
+        WaitUtils.waitForElementVisible(driver, adminHeaderLogo);
     }
 }
