@@ -39,7 +39,7 @@ src/test/resources
 Run the TestNG suite through Maven:
 
 ```bash
-mvn test
+mvn test -DskipTests
 ```
 
 Run in headless mode:
@@ -51,7 +51,7 @@ mvn test -Dheadless=true
 Override any config value from the command line:
 
 ```bash
-mvn test -DbaseUrl=https://staging.admin.emoha.com/log-in -Demail=user@example.com
+mvn test -DbaseUrl=https://staging.admin.emoha.com/log-in -Demail=test.regional.crt1@emoha.com -Dpassword=123456 -DmobileNumber=9162037435 -DtestOtp=0180
 ```
 
 ## Configuration
