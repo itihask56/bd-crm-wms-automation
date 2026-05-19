@@ -5,8 +5,13 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DriverFactory {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(DriverFactory.class);
 
     public static WebDriver driver;
 
@@ -21,8 +26,11 @@ public class DriverFactory {
                 Boolean.parseBoolean(
                         ConfigReader.getProperty("headless"));
 
+        logger.info("Initializing WebDriver. browser={}, headless={}", browser, headless);
+
         if (browser.equalsIgnoreCase("chrome")) {
 
+            logger.info("Setting up ChromeDriver with WebDriverManager");
             WebDriverManager.chromedriver().setup();
 
             ChromeOptions options = new ChromeOptions();
@@ -35,9 +43,15 @@ public class DriverFactory {
                 options.addArguments("--headless=new");
             }
             driver = new ChromeDriver(options);
+        } else {
+            logger.error("Unsupported browser requested: {}", browser);
+            throw new IllegalArgumentException(
+                    "Unsupported browser: " + browser
+            );
         }
 
         driver.manage().window().maximize();
+        logger.info("Browser window maximized");
 
         return driver;
     }
@@ -46,7 +60,13 @@ public class DriverFactory {
 
         if (driver != null) {
 
+            logger.info("Closing WebDriver session");
             driver.quit();
         }
+    }
+
+    public static WebDriver getDriver() {
+
+        return driver;
     }
 }
