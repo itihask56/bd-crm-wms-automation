@@ -2,6 +2,10 @@
 
 <suite name="BD CRM Automation Suite">
 
+    <listeners>
+        <listener class-name="com.emoha.crm.listeners.ScreenshotListener"/>
+    </listeners>
+
     <test name="UI Tests">
 
         <classes>

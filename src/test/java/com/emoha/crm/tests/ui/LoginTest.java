@@ -5,14 +5,20 @@ import com.emoha.crm.pages.AdminHeader;
 import com.emoha.crm.pages.LoginPage;
 import com.emoha.crm.pages.OtpModal;
 import com.emoha.crm.utils.ConfigReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class LoginTest extends BaseTest {
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(LoginTest.class);
+
     @Test
     public void verifyLoginFlow() {
 
+        logger.info("Opening CRM login page");
         driver.get(ConfigReader.getProperty("baseUrl"));
 
         LoginPage loginPage = new LoginPage(driver);
@@ -31,6 +37,7 @@ public class LoginTest extends BaseTest {
 
         AdminHeader adminHeader = new AdminHeader(driver);
 
+        logger.info("Verifying successful login through admin header logo");
         Assert.assertTrue(
                 adminHeader.isLogoDisplayed(),
                 "Emoha Admin header logo should be visible after successful login"
