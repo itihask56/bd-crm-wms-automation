@@ -9,7 +9,8 @@
     <test name="UI Tests">
 
         <classes>
-            <class name="com.emoha.crm.tests.ui.LoginTest"/>
+<!--            <class name="com.emoha.crm.tests.ui.LoginTest"/>-->
+            <class name="com.emoha.crm.tests.ui.AddCarerTest"/>
         </classes>
 
     </test>

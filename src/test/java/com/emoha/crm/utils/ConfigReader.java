@@ -99,6 +99,23 @@ public class ConfigReader {
         );
     }
 
+    public static String getOptionalProperty(String key) {
+
+        String systemValue = System.getProperty(key);
+
+        if (hasText(systemValue)) {
+            return systemValue;
+        }
+
+        String envValue = System.getenv(toEnvironmentKey(key));
+
+        if (hasText(envValue)) {
+            return envValue;
+        }
+
+        return properties.getProperty(key, "");
+    }
+
     private static boolean hasText(String value) {
 
         return value != null && !value.trim().isEmpty();
