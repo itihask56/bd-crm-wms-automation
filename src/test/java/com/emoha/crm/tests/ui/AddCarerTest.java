@@ -1,22 +1,40 @@
 package com.emoha.crm.tests.ui;
 
 import com.emoha.crm.base.BaseTest;
-import com.emoha.crm.pages.AdminHeader;
+import com.emoha.crm.pages.AddCarerPage;
 import com.emoha.crm.pages.LoginPage;
 import com.emoha.crm.pages.OtpModal;
+import com.emoha.crm.testdata.CarerTestData;
 import com.emoha.crm.utils.ConfigReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class LoginTest extends BaseTest {
+public class AddCarerTest extends BaseTest {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(LoginTest.class);
+            LoggerFactory.getLogger(AddCarerTest.class);
 
     @Test
-    public void verifyLoginFlow() {
+    public void regionalCrtCanAddCarer() {
+
+        loginAsRegionalCrt();
+
+        CarerTestData carer = CarerTestData.defaultCarer();
+        AddCarerPage addCarerPage = new AddCarerPage(driver);
+
+        addCarerPage.openFromMyCarers();
+        addCarerPage.fillForm(carer);
+        addCarerPage.submit();
+
+        Assert.assertTrue(
+                addCarerPage.isCarerVisibleInList(carer.getCarerName()),
+                "Newly added carer should be visible in My Carers list"
+        );
+    }
+
+    private void loginAsRegionalCrt() {
 
         logger.info("Opening CRM login page");
         driver.get(ConfigReader.getProperty("baseUrl"));
@@ -33,25 +51,6 @@ public class LoginTest extends BaseTest {
         otpModal.completeOtpFlow(
                 ConfigReader.getProperty("mobileNumber"),
                 ConfigReader.getProperty("testOtp")
-        );
-
-        AdminHeader adminHeader = new AdminHeader(driver);
-
-        logger.info("Verifying successful login through admin header logo");
-        Assert.assertTrue(
-                adminHeader.isLogoDisplayed(),
-                "Emoha Admin header logo should be visible after successful login"
-        );
-
-        Assert.assertEquals(
-                adminHeader.getLogoAltText(),
-                "Emoha Admin",
-                "Header logo alt text should match"
-        );
-
-        Assert.assertTrue(
-                adminHeader.getLogoSource().endsWith(".svg"),
-                "Header logo source should be an SVG image"
         );
     }
 }

@@ -1,11 +1,17 @@
 package com.emoha.crm.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 public class ConfigReader {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ConfigReader.class);
 
     private static final Properties properties = new Properties();
 
@@ -29,6 +35,7 @@ public class ConfigReader {
             }
 
             properties.load(inputStream);
+            logger.info("Loaded required configuration from classpath: {}", fileName);
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
@@ -43,6 +50,7 @@ public class ConfigReader {
 
             if (inputStream != null) {
                 properties.load(inputStream);
+                logger.info("Loaded optional configuration from classpath: {}", fileName);
             }
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
@@ -54,8 +62,9 @@ public class ConfigReader {
         try (InputStream inputStream = new FileInputStream(filePath)) {
 
             properties.load(inputStream);
+            logger.info("Loaded optional local configuration file: {}", filePath);
         } catch (IOException ignored) {
-            // Optional local override file for developer secrets.
+            logger.debug("Optional local configuration file not found: {}", filePath);
         }
     }
 
@@ -88,6 +97,23 @@ public class ConfigReader {
                         + ", or add it to ignored file "
                         + "src/test/resources/config.local.properties"
         );
+    }
+
+    public static String getOptionalProperty(String key) {
+
+        String systemValue = System.getProperty(key);
+
+        if (hasText(systemValue)) {
+            return systemValue;
+        }
+
+        String envValue = System.getenv(toEnvironmentKey(key));
+
+        if (hasText(envValue)) {
+            return envValue;
+        }
+
+        return properties.getProperty(key, "");
     }
 
     private static boolean hasText(String value) {
