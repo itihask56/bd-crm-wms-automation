@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-public class LeadCreationTest {
+public class LeadCreationAndScreeningTest {
 
     private static final Logger logger =
-            LoggerFactory.getLogger(LeadCreationTest.class);
+            LoggerFactory.getLogger(LeadCreationAndScreeningTest.class);
 
     @Test
-    public void leadCanBeCreated() {
+    public void leadCanBeCreatedAndScreened() {
 
         LeadApiClient leadApiClient = new LeadApiClient();
         LeadTestData leadTestData = LeadTestData.defaultLead();
@@ -35,5 +35,7 @@ public class LeadCreationTest {
                 leadCreationResult.recordId() > 0,
                 "Create lead response should include valid record_id"
         );
+
+        leadApiClient.submitLeadScreening(leadTestData, leadCreationResult);
     }
 }

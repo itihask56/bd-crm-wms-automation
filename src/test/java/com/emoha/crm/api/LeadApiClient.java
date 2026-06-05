@@ -5,11 +5,14 @@ import com.emoha.crm.utils.ConfigReader;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.json.JSONObject;
 
 public class LeadApiClient {
 
     private static final String CREATE_LEAD_PATH =
             "/api/v2/responder/cflow-crm/create-lead-record-in-cflow";
+    private static final String UPDATE_STAGE_PATH =
+            "/api/v2/responder/cflow-crm/update-stage-details-in-workflow";
 
     private final String baseApiUrl;
     private final String createLeadToken;
@@ -54,6 +57,39 @@ public class LeadApiClient {
         }
 
         return new LeadCreationResult(leadUuid, Integer.parseInt(recordId));
+    }
+
+    public void submitLeadScreening(
+            LeadTestData leadTestData,
+            LeadCreationResult leadCreationResult
+    ) {
+
+        JSONObject payload = new JSONObject()
+                .put("stage_name", leadTestData.getStageName())
+                .put("record_id", leadCreationResult.recordId())
+                .put("status", leadTestData.getScreeningStatus())
+                .put("values", new JSONObject(leadTestData.screeningValues()))
+                .put("lead_uuid", leadCreationResult.leadUuid());
+
+        Response response = RestAssured
+                .given()
+                .baseUri(baseApiUrl)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .header("authorization", bearerToken(ConfigReader.getProperty("leadScreeningAuthToken")))
+                .header("devicetype", deviceType)
+                .body(payload.toString())
+                .post(UPDATE_STAGE_PATH)
+                .then()
+                .extract()
+                .response();
+
+        response.then().statusCode(200);
+        int responseCode = response.jsonPath().getInt("code");
+
+        if (responseCode != 200) {
+            throw new AssertionError("Lead screening API returned code " + responseCode);
+        }
     }
 
     private String configuredOrDefault(String key, String defaultValue) {
