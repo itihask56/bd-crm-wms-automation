@@ -40,11 +40,16 @@ public class LeadApiClient {
                 .extract()
                 .response();
 
-        response.then().statusCode(200);
+        assertSuccessfulResponse(response, "Create lead API");
         int responseCode = response.jsonPath().getInt("code");
 
         if (responseCode != 200) {
-            throw new AssertionError("Create lead API returned code " + responseCode);
+            throw new AssertionError(
+                    "Create lead API returned code "
+                            + responseCode
+                            + " with body: "
+                            + response.asString()
+            );
         }
 
         String leadUuid = response.jsonPath().getString("data.lead_uuid");
@@ -84,11 +89,29 @@ public class LeadApiClient {
                 .extract()
                 .response();
 
-        response.then().statusCode(200);
+        assertSuccessfulResponse(response, "Lead screening API");
         int responseCode = response.jsonPath().getInt("code");
 
         if (responseCode != 200) {
-            throw new AssertionError("Lead screening API returned code " + responseCode);
+            throw new AssertionError(
+                    "Lead screening API returned code "
+                            + responseCode
+                            + " with body: "
+                            + response.asString()
+            );
+        }
+    }
+
+    private void assertSuccessfulResponse(Response response, String apiName) {
+
+        if (response.statusCode() != 200) {
+            throw new AssertionError(
+                    apiName
+                            + " returned HTTP status "
+                            + response.statusCode()
+                            + " with body: "
+                            + response.asString()
+            );
         }
     }
 
