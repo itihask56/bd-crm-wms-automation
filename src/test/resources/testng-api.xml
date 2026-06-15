@@ -5,7 +5,8 @@
     <test name="Lead API Tests">
 
         <classes>
-            <class name="com.emoha.crm.tests.api.LeadCreationAndScreeningTest"/>
+<!--            <class name="com.emoha.crm.tests.api.LeadCreationAndScreeningTest"/>-->
+            <class name="com.emoha.crm.tests.api.LeadCreationScreeningAndQuotationSharingTest"/>
         </classes>
 
     </test>

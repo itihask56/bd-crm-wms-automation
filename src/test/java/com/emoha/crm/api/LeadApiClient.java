@@ -1,6 +1,7 @@
 package com.emoha.crm.api;
 
 import com.emoha.crm.testdata.LeadTestData;
+import com.emoha.crm.testdata.QuotationSharingTestData;
 import com.emoha.crm.utils.ConfigReader;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -102,6 +103,85 @@ public class LeadApiClient {
         }
     }
 
+    public void submitQuotationSharingNew(
+            QuotationSharingTestData quotationSharingTestData,
+            LeadCreationResult leadCreationResult,
+            int cflowRecordId,
+            String serviceStartDate
+    ) {
+
+        submitQuotationSharing(
+                quotationSharingTestData,
+                leadCreationResult,
+                cflowRecordId,
+                serviceStartDate,
+                "New",
+                new JSONObject(quotationSharingTestData.newValues())
+        );
+    }
+
+    public void submitQuotationSharingCompleted(
+            QuotationSharingTestData quotationSharingTestData,
+            LeadCreationResult leadCreationResult,
+            int cflowRecordId,
+            String serviceStartDate
+    ) {
+
+        submitQuotationSharing(
+                quotationSharingTestData,
+                leadCreationResult,
+                cflowRecordId,
+                serviceStartDate,
+                "Completed",
+                new JSONObject(quotationSharingTestData.completedValues())
+        );
+    }
+
+    private void submitQuotationSharing(
+            QuotationSharingTestData quotationSharingTestData,
+            LeadCreationResult leadCreationResult,
+            int cflowRecordId,
+            String serviceStartDate,
+            String status,
+            JSONObject values
+    ) {
+
+        JSONObject payload = new JSONObject()
+                .put("stage_name", quotationSharingTestData.getStageName())
+                .put("record_id", cflowRecordId)
+                .put("status", status)
+                .put("lead_uuid", leadCreationResult.leadUuid())
+                .put("service_start_date", serviceStartDate)
+                .put("values", values);
+
+        Response response = RestAssured
+                .given()
+                .baseUri(baseApiUrl)
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
+                .header("authorization", bearerToken(quotationSharingToken()))
+                .header("devicetype", deviceType)
+                .body(payload.toString())
+                .post(UPDATE_STAGE_PATH)
+                .then()
+                .extract()
+                .response();
+
+        assertSuccessfulResponse(response, "Quotation sharing " + status + " API");
+        int responseCode = response.jsonPath().getInt("code");
+
+        if (responseCode != 200) {
+            throw new AssertionError(
+                    "Quotation sharing "
+                            + status
+                            + " API returned code "
+                            + responseCode
+                            + " with body: "
+                            + response.asString()
+            );
+        }
+    }
+
     private void assertSuccessfulResponse(Response response, String apiName) {
 
         if (response.statusCode() != 200) {
@@ -133,6 +213,17 @@ public class LeadApiClient {
         }
 
         return "Bearer " + token.trim();
+    }
+
+    private String quotationSharingToken() {
+
+        String token = ConfigReader.getOptionalProperty("quotationSharingAuthToken");
+
+        if (isBlank(token)) {
+            return ConfigReader.getProperty("leadScreeningAuthToken");
+        }
+
+        return token;
     }
 
     private boolean isBlank(String value) {
